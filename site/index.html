@@ -1,0 +1,153 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Thais Adeodato, data governance and architecture</title>
+<meta name="description" content="I turn messy data and spaces into clear systems, from cities to catalogs. Portfolio of Thais Adeodato.">
+<link rel="canonical" href="https://thaisadeodato-k.github.io/portfolio/">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Thais Adeodato">
+<meta property="og:title" content="Thais Adeodato, data governance and architecture">
+<meta property="og:description" content="I turn messy data and spaces into clear systems, from cities to catalogs. Portfolio of Thais Adeodato.">
+<meta property="og:url" content="https://thaisadeodato-k.github.io/portfolio/">
+<meta property="og:image" content="https://thaisadeodato-k.github.io/portfolio/capa-escuro.jpg">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="theme-color" content="#fafaf8" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#0f1113" media="(prefers-color-scheme: dark)">
+<link rel="icon" type="image/svg+xml" href="/favicon.svg">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;700&family=Geist+Mono:wght@500&display=swap" rel="stylesheet">
+<script>
+  // Tema antes da primeira pintura, para não piscar
+  (function () {
+    var tema;
+    try { tema = localStorage.getItem('tema'); } catch (e) {}
+    if (tema !== 'claro' && tema !== 'escuro') tema = matchMedia('(prefers-color-scheme: dark)').matches ? 'escuro' : 'claro';
+    document.documentElement.dataset.tema = tema;
+  })();
+</script>
+</head>
+<body>
+<header class="topo">
+  <a class="logo" href="#inicio" aria-label="Thais Adeodato">T<br>A.</a>
+  <a class="pular" href="#trabalhos" data-t="pular">Skip to work</a>
+  <div class="topo-acoes">
+    <button class="botao-icone" type="button" data-trocar-idioma lang="pt">PT</button>
+    <button class="botao-icone" type="button" data-trocar-tema>
+      <svg class="icone-sol" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="4.5"/><path d="M12 2v2.5M12 19.5V22M2 12h2.5M19.5 12H22M4.9 4.9l1.8 1.8M17.3 17.3l1.8 1.8M4.9 19.1l1.8-1.8M17.3 6.7l1.8-1.8"/></svg>
+      <svg class="icone-lua" viewBox="0 0 24 24" aria-hidden="true"><path d="M20 14.5A8.5 8.5 0 0 1 9.5 4a8.5 8.5 0 1 0 10.5 10.5z"/></svg>
+    </button>
+    <a class="botao-cinza" data-cv href="/cv.pdf" download data-t="cv">CV</a>
+    <button class="botao-cinza" type="button" data-abrir-menu aria-expanded="false" aria-controls="menu">
+      <span data-t="menu">Menu</span>
+      <svg viewBox="0 0 12 12" aria-hidden="true"><circle cx="3" cy="3" r="1.2"/><circle cx="9" cy="3" r="1.2"/><circle cx="3" cy="9" r="1.2"/><circle cx="9" cy="9" r="1.2"/></svg>
+    </button>
+  </div>
+</header>
+
+<img class="capa capa-claro" src="/capa-claro.jpg" alt="" aria-hidden="true">
+<img class="capa capa-escuro" src="/capa-escuro.jpg" alt="" aria-hidden="true">
+<canvas id="cena" aria-hidden="true"></canvas>
+<div class="cursor" aria-hidden="true"></div>
+
+<main>
+  <section id="inicio" class="entrada">
+    <div class="entrada-palco">
+      <!-- Texto da placa de vidro: com 3D, é encaixado sobre o caco principal -->
+      <div class="placa-texto">
+        <div class="placa-bloco">
+          <h1 class="nome">Thais Adeodato</h1>
+          <p class="frase"><span data-t="frase1">I turn messy data and spaces into clear systems,</span> <span class="frase-cinza" data-t="frase2">from cities to catalogs.</span></p>
+          <a class="botao-escuro cta" href="#trabalhos" data-t="cta">See my work</a>
+        </div>
+        <p class="placa-rodape"><span data-t="area">Data governance · Architecture</span><span data-t="local">Espírito Santo, Brazil</span></p>
+      </div>
+    </div>
+  </section>
+
+  <section id="trabalhos" class="secao" aria-labelledby="titulo-trabalhos">
+    <h2 id="titulo-trabalhos" data-t="trabalhos">Work</h2>
+    <p class="secao-intro" data-t="trabalhosIntro"></p>
+    <div class="carrossel">
+      <ul class="pastas"></ul>
+    </div>
+    <div class="carrossel-controle">
+      <button class="carrossel-seta" type="button" data-anterior><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M14.5 6l-6 6 6 6"/></svg></button>
+      <span class="carrossel-pontos" aria-hidden="true"></span>
+      <button class="carrossel-seta" type="button" data-proximo><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9.5 6l6 6-6 6"/></svg></button>
+    </div>
+  </section>
+
+  <section id="sobre" class="secao" aria-labelledby="titulo-sobre">
+    <h2 id="titulo-sobre" data-t="sobre">About</h2>
+    <div class="sobre-colunas">
+      <p class="sobre-texto" data-t="sobreTexto"></p>
+      <div>
+        <p class="contador" aria-label="on Earth since 2001">
+          <span class="contador-cinza" data-t="naTerra">on Earth</span>
+          <span class="contador-cinza" data-t="desde">since</span>
+          <span class="contador-numero" aria-hidden="true"><span class="contador-zeros">000000</span><span class="contador-ano">2001</span></span>
+        </p>
+        <h3 data-t="curiosidades">A few things about me</h3>
+        <ul class="curiosidades"></ul>
+      </div>
+    </div>
+  </section>
+
+  <section id="contato" class="secao" aria-labelledby="titulo-contato">
+    <h2 id="titulo-contato" data-t="contato">Contact</h2>
+    <p class="secao-intro" data-t="contatoTexto"></p>
+    <ul class="contatos">
+      <li><a data-email href="#"></a></li>
+      <li><a data-link="linkedin" href="#" target="_blank" rel="noopener">LinkedIn</a></li>
+      <li><a data-link="instagram" href="#" target="_blank" rel="noopener">Instagram</a></li>
+      <li><a data-link="github" href="#" target="_blank" rel="noopener">GitHub</a></li>
+      <li><a data-cv href="/cv.pdf" download data-t="cvLongo">Download CV</a></li>
+    </ul>
+  </section>
+</main>
+
+<footer class="rodape"><p data-t="rodape"></p></footer>
+
+<div class="painel" hidden>
+  <div class="painel-veu"></div>
+  <div class="painel-camada"></div>
+  <div class="painel-camada"></div>
+  <article class="painel-janela" role="dialog" aria-modal="true" aria-labelledby="painel-titulo">
+    <div class="painel-capa" aria-hidden="true"></div>
+    <div class="painel-texto">
+      <button class="painel-fechar" type="button" aria-label="Close">
+        <svg viewBox="0 0 16 16" aria-hidden="true"><path d="M3.5 3.5l9 9M12.5 3.5l-9 9"/></svg>
+      </button>
+      <h2 id="painel-titulo"></h2>
+      <p class="painel-resumo"></p>
+      <dl class="painel-campos"></dl>
+      <div class="painel-link"></div>
+    </div>
+  </article>
+</div>
+
+<div class="menu" id="menu" hidden role="dialog" aria-modal="true" aria-label="Menu">
+  <div class="menu-topo">
+    <span class="logo" aria-hidden="true">T<br>A.</span>
+    <button class="botao-cinza" type="button" data-fechar-menu data-t="fechar">Close</button>
+  </div>
+  <nav class="menu-nav">
+    <a href="#trabalhos" data-t-menu="trabalhos">Work</a>
+    <a href="#sobre" data-t-menu="sobre">About</a>
+    <a href="#contato" data-t-menu="contato">Contact</a>
+  </nav>
+  <div class="menu-rodape">
+    <a data-email href="#"></a>
+    <a data-link="linkedin" href="#" target="_blank" rel="noopener">LinkedIn</a>
+    <a data-link="instagram" href="#" target="_blank" rel="noopener">Instagram</a>
+    <a data-link="github" href="#" target="_blank" rel="noopener">GitHub</a>
+    <button class="botao-cinza" type="button" data-trocar-idioma-menu data-t="idiomaNome">Ler em português</button>
+  </div>
+</div>
+
+<script type="module" src="/src/main.js"></script>
+</body>
+</html>

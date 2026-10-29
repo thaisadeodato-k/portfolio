@@ -1,0 +1,12 @@
+# Só o site e o deploy vão para o GitHub.
+# O kit de conteúdo, os modelos originais e as instruções ficam só neste computador.
+/*
+!/.gitignore
+!/.github/
+!/site/
+
+site/node_modules/
+site/dist/
+site/prototipos/
+site/.prints/
+site/revisao.html
