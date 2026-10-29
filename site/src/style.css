@@ -180,7 +180,10 @@ main { position: relative; z-index: 1; }
   position: relative; height: calc(var(--larg) * 1.32); max-width: none;
   margin-top: 8px; touch-action: pan-y; user-select: none;
 }
-.pastas { list-style: none; margin: 0; padding: 0; }
+.pastas {
+  list-style: none; margin: 0; padding: 0; position: absolute; inset: 0;
+  transform: translateX(calc(var(--desvio, 0) * var(--passo)));
+}
 .pastas li {
   position: absolute; left: 50%; top: 0; width: var(--larg); height: 100%; margin-left: calc(var(--larg) / -2);
   transform: translateX(calc(var(--d, 0) * var(--passo))) scale(var(--escala, 1));

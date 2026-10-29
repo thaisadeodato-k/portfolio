@@ -39,6 +39,8 @@ export function iniciarProjetos({ lista, painel, textos, idioma, reduzir, aoMuda
       li.classList.toggle('ativo', d === 0);
       li.classList.toggle('longe', a > 2);
     });
+    // Com número par de cartões sobra um de um lado: o conjunto anda meio passo para ficar no centro
+    lista.style.setProperty('--desvio', n % 2 === 0 ? 0.5 : 0);
     pontos.querySelectorAll('i').forEach((p, i) => p.classList.toggle('ativo', i === atual));
   }
   function irPara(i, focar = false) {

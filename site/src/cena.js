@@ -35,7 +35,10 @@ const CELULAS_5 = [
 ];
 // Com 4 projetos, os dois cacos de cima do meio viram um só
 const CELULAS_4 = [CELULAS_5[0], ['tAB', 'tCE', 'J2', 'J1', 'J0'], CELULAS_5[3], CELULAS_5[4]];
-const PONTOS_CONTORNO = 72;
+// Muitos pontos no contorno: cantos lisos, sem facetas
+const PONTOS_CONTORNO = 180;
+// Chanfro arredondado das bordas (em unidades de S)
+const CHANFRO = 3.6;
 
 // Recua um polígono para dentro (as frestas entre os cacos)
 function recuar(pts, g) {
@@ -61,7 +64,7 @@ function recuar(pts, g) {
 }
 
 // Cantos arredondados, já como lista de pontos
-function arredondar(pts, r, passos = 5) {
+function arredondar(pts, r, passos = 12) {
   const saida = [];
   for (let i = 0; i < pts.length; i++) {
     const p = pts[i], antes = pts[(i - 1 + pts.length) % pts.length], depois = pts[(i + 1) % pts.length];
@@ -159,7 +162,7 @@ export async function iniciarCena({ canvas, base, projetos, tema, reduzir, celul
       malha, capa, eixo,
       centro: new THREE.Vector2(), topo: 0, contorno: null,
       mola: { z: 0, vz: 0, rx: 0, vrx: 0, ry: 0, vry: 0 }, hover: 0,
-      giro: 2 + sorte() * 1.6, balanco: (0.35 + sorte() * 0.35) * (sorte() > 0.5 ? 1 : -1), elevar: 420 + sorte() * 380, lado: new THREE.Vector2(sorte() - 0.5, sorte() - 0.5),
+      giro: 2 + sorte() * 1.6, balanco: (0.08 + sorte() * 0.08) * (sorte() > 0.5 ? 1 : -1), camada: 0, elevar: 420 + sorte() * 380, lado: new THREE.Vector2(sorte() - 0.5, sorte() - 0.5),
       alvo: null,
     };
   });
@@ -206,7 +209,7 @@ export async function iniciarCena({ canvas, base, projetos, tema, reduzir, celul
   function contornoDaCelula(pts, i) {
     const S = tela.S;
     const poligono = CELULAS[i].map((n) => placaParaMundo(pts[n]));
-    return reamostrar(arredondar(recuar(poligono, 7 * S + 2.6 * S), 20 * S), PONTOS_CONTORNO);
+    return reamostrar(arredondar(recuar(poligono, 7 * S + CHANFRO * S), 26 * S), PONTOS_CONTORNO);
   }
 
   // Contorno do cartão de destino (retângulo de cantos redondos)
@@ -215,9 +218,11 @@ export async function iniciarCena({ canvas, base, projetos, tema, reduzir, celul
     // Cartões da frente ficam um pouco mais perto; o tamanho compensa a perspectiva
     const z = (2 - Math.abs(a.d)) * 12;
     const f = (tela.dist - z) / tela.dist;
-    const w = (a.w / 2) * f, h = (a.h / 2) * f;
+    // O chanfro cresce para fora: o contorno encolhe o mesmo tanto para o cartão bater com o HTML
+    const b = CHANFRO * tela.S;
+    const w = (a.w / 2) * f - b, h = (a.h / 2) * f - b;
     const cantos = [new THREE.Vector2(c.x - w, c.y + h), new THREE.Vector2(c.x + w, c.y + h), new THREE.Vector2(c.x + w, c.y - h), new THREE.Vector2(c.x - w, c.y - h)];
-    return { pontos: reamostrar(arredondar(cantos, a.raio * f, 8), PONTOS_CONTORNO), z, d: a.d, slug: a.slug };
+    return { pontos: reamostrar(arredondar(cantos, Math.max(1, a.raio * f - b), 16), PONTOS_CONTORNO), z, d: a.d, slug: a.slug };
   }
 
   function construir(caco, contorno, espessura, comCapa) {
@@ -228,13 +233,13 @@ export async function iniciarCena({ canvas, base, projetos, tema, reduzir, celul
     const local = contorno.map((p) => new THREE.Vector2(p.x - c.x, p.y - c.y));
     const forma = new THREE.Shape(local);
     const geo = new THREE.ExtrudeGeometry(forma, {
-      depth: espessura, bevelEnabled: true, bevelThickness: 2.6 * S, bevelSize: 2.6 * S, bevelSegments: 3, curveSegments: 1,
+      depth: espessura, bevelEnabled: true, bevelThickness: CHANFRO * S, bevelSize: CHANFRO * S, bevelSegments: 6, curveSegments: 1,
     });
     geo.translate(0, 0, -espessura / 2);
     caco.malha.geometry.dispose();
     caco.malha.geometry = geo;
     caco.centro.copy(c);
-    caco.topo = espessura / 2 + 2.6 * S;
+    caco.topo = espessura / 2 + CHANFRO * S;
     if (comCapa) {
       // Capa por cima, recortada como o "cover" do CSS (altura inteira, meio da largura)
       const g = new THREE.ShapeGeometry(forma);
@@ -294,6 +299,10 @@ export async function iniciarCena({ canvas, base, projetos, tema, reduzir, celul
     // Ordem pelos cacos na placa (não pelo contorno em voo, que muda no caminho)
     const meio = (c) => (c.contornoPlaca ? c.contornoPlaca.reduce((s, q) => s + q.x, 0) / c.contornoPlaca.length : 0);
     const ordem = cacos.map((c, i) => i).sort((a, b) => meio(cacos[a]) - meio(cacos[b]));
+    // Camada de voo: quem pousa mais à frente no carrossel voa mais alto
+    cacos.map((c, i) => ({ c, d: Math.abs(destinos[ordem.indexOf(i)]?.d ?? 9) }))
+      .sort((a, b) => b.d - a.d)
+      .forEach(({ c }, n) => { c.camada = n; });
     ordem.forEach((i, k) => {
       const destino = destinos[k];
       if (!destino) return;
@@ -357,8 +366,8 @@ export async function iniciarCena({ canvas, base, projetos, tema, reduzir, celul
 
     // Inclinação da placa toda, como se o cursor apertasse aquele ponto
     const calmo = (reduzir ? 0 : 1) * (1 - degrau(0, 0.25, p));
-    inclinY = suavizar(inclinY, mouseDentro ? (mouse.x * graus(7) - graus(1.2)) * calmo : 0, 3.3, dt);
-    inclinX = suavizar(inclinX, mouseDentro ? (-mouse.y * graus(5.5) + graus(0.8)) * calmo : 0, 3.3, dt);
+    inclinY = suavizar(inclinY, mouseDentro ? mouse.x * graus(5) * calmo : 0, 3.3, dt);
+    inclinX = suavizar(inclinX, mouseDentro ? -mouse.y * graus(4) * calmo : 0, 3.3, dt);
     palco.rotation.set(-inclinX, inclinY, 0);
     brilhoCursor.uGlow.value = suavizar(brilhoCursor.uGlow.value, mouseDentro && p < 0.1 ? 1 : 0, 5, dt);
 
@@ -375,7 +384,7 @@ export async function iniciarCena({ canvas, base, projetos, tema, reduzir, celul
     if (reconstruir) proximaConstrucao = t + 1 / 45;
     const pts = reconstruir ? cortes(t * (reduzir ? 0.5 : 1), 1 / 45) : null;
     cacos.forEach((c, i) => {
-      const k = reduzir ? 0 : degrau(0.04 + i * 0.03, 0.8 + i * 0.03, p);
+      const k = reduzir ? 0 : degrau(0.04 + c.camada * 0.02, 0.84 + c.camada * 0.02, p);
       if (reconstruir || (k > 0 && k < 1)) {
         const daPlaca = pts ? contornoDaCelula(pts, i) : c.contornoPlaca;
         if (pts) c.contornoPlaca = daPlaca;
@@ -409,7 +418,8 @@ export async function iniciarCena({ canvas, base, projetos, tema, reduzir, celul
       c.malha.position.set(
         c.centro.x + c.lado.x * 900 * S * e,
         c.centro.y + (c.lado.y * 600 - 300) * S * e,
-        m.z + (c.elevar * S) * (e + arco * 0.4) + (c.alvo ? c.alvo.z * k : 0),
+        // No ar, cada caco voa na sua camada (os da frente mais alto): nenhum atravessa outro
+        m.z + c.elevar * S * e + arco * (90 + c.camada * 120) * S + (c.alvo ? c.alvo.z * k : 0),
       );
       c.malha.quaternion.setFromAxisAngle(c.eixo, c.giro * e + c.balanco * arco);
       eixoTmp.setFromEuler(new THREE.Euler(m.rx, m.ry, 0));
@@ -424,7 +434,9 @@ export async function iniciarCena({ canvas, base, projetos, tema, reduzir, celul
     if (!captura) {
       quadros++; tempoQuadros += dt;
       if (quadros === 90) {
-        if (quadros / tempoQuadros < 40 && pixelRatio > 0.75) { pixelRatio = Math.max(0.75, pixelRatio - 0.5); ajustar(); }
+        // No computador nunca abaixo de 1: abaixo disso as bordas serrilham
+        const minimo = celular ? 0.75 : 1;
+        if (quadros / tempoQuadros < 40 && pixelRatio > minimo) { pixelRatio = Math.max(minimo, pixelRatio - 0.5); ajustar(); }
         quadros = 0; tempoQuadros = 0;
       }
     }
