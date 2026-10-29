@@ -158,14 +158,18 @@ function aoVoo(v) {
 addEventListener('scroll', aoRolar, { passive: true });
 addEventListener('resize', aoRolar);
 
-// Onde cada cartão do carrossel fica no fim da rolagem da entrada (destino dos cacos)
+// Onde cada cartão do carrossel fica (destino dos cacos). No meio da rolagem vale a posição
+// do fim; perto do fim, a posição real na tela, para os cacos pousarem exatamente sobre os
+// cartões em HTML mesmo se a rolagem parar um pouco antes do fim.
 function medirCartoes() {
   const fim = entrada.offsetTop + entrada.offsetHeight - innerHeight;
+  const t = Math.min(1, Math.max(0, (scrollY / Math.max(1, fim) - 0.8) / 0.2));
+  const real = t * t * (3 - 2 * t);
   return [...document.querySelectorAll('.pastas li')].map((li) => {
     const r = li.getBoundingClientRect();
     const escala = Number(li.style.getPropertyValue('--escala') || 1);
     return {
-      x: r.left, y: r.top + scrollY - fim, w: r.width, h: r.height,
+      x: r.left, y: r.top + (scrollY - fim) * (1 - real), w: r.width, h: r.height,
       d: Number(li.style.getPropertyValue('--d') || 0),
       raio: parseFloat(getComputedStyle(li.firstElementChild).borderTopLeftRadius) * escala,
       slug: li.querySelector('.pasta').dataset.slug,
